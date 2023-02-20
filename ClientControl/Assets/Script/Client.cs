@@ -24,7 +24,7 @@ public class Client : MonoBehaviour
     public string ip;
     public int port;
 
-    private string SendStr = "c";
+    private string SendStr = "%1POWR";
     private IEnumerator coroutine;
     private bool isCoroutine = false;
 
@@ -33,9 +33,9 @@ public class Client : MonoBehaviour
          ConnectToServer();
      }*/
 
-   public void StartBtn()
+    public void StartBtn()
     {
-        ConnectToServer();  
+        ConnectToServer();
     }
 
     public void ConnectToServer()
@@ -47,8 +47,8 @@ public class Client : MonoBehaviour
         }
 
         // 기본 호스트/ 포트번호
-        ip = IpInput.text == "" ? "xxx.xxx.xx.xx" : IpInput.text; // IP 번호를 입력하세요 
-        port = PortInput.text == "" ? 0000 : int.Parse(PortInput.text); // 포트 번호를 입력하세요
+        ip = IpInput.text == "" ? "192.168.10.27" : IpInput.text;
+        port = PortInput.text == "" ? 3040 : int.Parse(PortInput.text);
 
         // 소켓 생성
         try
@@ -82,8 +82,7 @@ public class Client : MonoBehaviour
         }
     }
 
-    IEnumerator countTime(float delayTime) // 서버가 열렸는지 계속 확인하기 위한 코루틴 
-                                            // 만약 닫혔다가 서버가 다시 열리면 소켓 재생성 
+    IEnumerator countTime(float delayTime)
     {
         isCoroutine = true;
         yield return new WaitForSeconds(delayTime);
@@ -101,7 +100,7 @@ public class Client : MonoBehaviour
             return;
         }
 
-        else if (data == "s") // PC OFF 명령 , 서버에서 s를 브로드캐스트 한것을 받음.
+        else if (data == "s")
         {
             Chat.instance.ShowMessage("offcomputer");
             OffComputer();
@@ -120,7 +119,7 @@ public class Client : MonoBehaviour
             writer.Flush();
         }
 
-        catch (Exception e) // 문자를 계속 보내면서 서버가 열렸는지 확인 
+        catch (Exception e)
         {
             Chat.instance.ShowMessage("소켓다시생성");
             CloseSocket();
@@ -128,7 +127,7 @@ public class Client : MonoBehaviour
         }
     }
 
-    public void OnSendButton(string SendInput) // 문자를 계속 보내면서 서버가 열렸는지 확인 
+    public void OnSendButton(string SendInput)
     {
         if (SendInput.Trim() == "") return;
         SendInput = "c";
@@ -137,7 +136,7 @@ public class Client : MonoBehaviour
         Send(message);
 
     }
-    void OnApplicationQuit()  //어플 종료시 소켓 닫기
+    void OnApplicationQuit()
     {
         CloseSocket();
     }
@@ -168,8 +167,8 @@ public class Client : MonoBehaviour
 
 
         pro.StartInfo = proInfo;
-        pro.Start(); 
-        pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine); // 셧다운 명령어 
+        pro.Start();
+        pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine);
         pro.StandardInput.Close();
 
 
