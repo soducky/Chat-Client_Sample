@@ -9,10 +9,11 @@ using Unity.VisualScripting;
 using System.Diagnostics;
 using TMPro;
 using UnityEngine.UIElements;
+using UnityEngine.Windows;
 
 public class Client : MonoBehaviour
 {
-    public InputField IpInput, PortInput;
+   // public InputField ClientInput, PortInput, ServerInput;  //클라이언트ip, 포트, 서버 ip 3개 선언 -인풋 필드 
     string clientName;
 
     bool socketReady; // 소켓 준비되었는지
@@ -21,19 +22,14 @@ public class Client : MonoBehaviour
     StreamWriter writer;
     StreamReader reader;
 
-    public string ip;
-    public int port;
+   // int Port;
+   // string ServerIP;
 
-    private string SendStr = "%1POWR";
-    private IEnumerator coroutine;
-    private bool isCoroutine = false;
+    // private string SendStr = "%1POWR";
+    // private IEnumerator coroutine;
+    // private bool isCoroutine = false;
 
-    /* private void Start()
-     {
-         ConnectToServer();
-     }*/
-
-    public void StartBtn()
+    private void Start()
     {
         ConnectToServer();
     }
@@ -47,13 +43,14 @@ public class Client : MonoBehaviour
         }
 
         // 기본 호스트/ 포트번호
-        ip = IpInput.text == "" ? "192.168.10.27" : IpInput.text;
-        port = PortInput.text == "" ? 3040 : int.Parse(PortInput.text);
+      // ClientIP = ClientInput.text;
+     //  Port = PortInput.text == "" ? DataManager.Instance.data.Port : int.Parse(PortInput.text);
+      //  ServerIP = ServerInput.text == "" ? DataManager.Instance.data.ServerIP : ServerInput.text;
 
         // 소켓 생성
         try
         {
-            socket = new TcpClient(ip, port);
+            socket = new TcpClient(DataManager.Instance.data.ServerIP, DataManager.Instance.data.Port);
             stream = socket.GetStream();
             writer = new StreamWriter(stream);
             reader = new StreamReader(stream);
@@ -75,105 +72,107 @@ public class Client : MonoBehaviour
                 OnIncomingData(data);
         }
 
-        if (!isCoroutine)
+        /*     if (!isCoroutine)
+             {
+                 coroutine = countTime(30f);
+                 StartCoroutine(coroutine);
+             }
+         }
+
+         IEnumerator countTime(float delayTime)
+         {
+             isCoroutine = true;
+             yield return new WaitForSeconds(delayTime);
+             OnSendButton(SendStr);
+             isCoroutine = false;
+
+         }*/
+
+        void OnIncomingData(string data)
         {
-            coroutine = countTime(30f);
-            StartCoroutine(coroutine);
-        }
-    }
+            if (data == "%NAME") //닉네임 표시
+            {
+                clientName = DataManager.Instance.data.ClientIP;
+                Send($"&NAME|{clientName}");
+                return;
+            }
 
-    IEnumerator countTime(float delayTime)
-    {
-        isCoroutine = true;
-        yield return new WaitForSeconds(delayTime);
-        OnSendButton(SendStr);
-        isCoroutine = false;
+            else if (data == DataManager.Instance.data.ClientIP)
+            {
+                Chat.instance.ShowMessage("offcomputer");
+                OffComputer();
+            }
 
-    }
-
-    void OnIncomingData(string data)
-    {
-        if (data == "%NAME") //닉네임 표시
-        {
-            clientName = "PC1";
-            Send($"&NAME|{clientName}");
-            return;
-        }
-
-        else if (data == "s")
-        {
-            Chat.instance.ShowMessage("offcomputer");
-            OffComputer();
-        }
-
-        Chat.instance.ShowMessage(data);
-    }
-
-    void Send(string data)
-    {
-        if (!socketReady) return;
-
-        try
-        {
-            writer.WriteLine(data);
-            writer.Flush();
+            Chat.instance.ShowMessage(data);
         }
 
-        catch (Exception e)
+        void Send(string data)
         {
-            Chat.instance.ShowMessage("소켓다시생성");
+            if (!socketReady) return;
+
+            try
+            {
+                writer.WriteLine(data);
+                writer.Flush();
+            }
+
+            catch (Exception e)
+            {
+                Chat.instance.ShowMessage("소켓다시생성");
+                UnityEngine.Debug.Log(e);
+                CloseSocket();
+                ConnectToServer();
+            }
+        }
+
+      /*  public void OnSendButton(string SendInput)
+        {
+            if (SendInput.Trim() == "") return;
+            SendInput = "c";
+            string message = SendInput;
+
+            Send(message);
+
+        }
+         void OnApplicationQuit()
+        {
             CloseSocket();
-            ConnectToServer();
+        }*/
+
+        void CloseSocket()
+        {
+            if (!socketReady) return;
+
+            writer.Close();
+            reader.Close();
+            socket.Close();
+            socketReady = false;
         }
-    }
 
-    public void OnSendButton(string SendInput)
-    {
-        if (SendInput.Trim() == "") return;
-        SendInput = "c";
-        string message = SendInput;
-
-        Send(message);
-
-    }
-    void OnApplicationQuit()
-    {
-        CloseSocket();
-    }
-
-    void CloseSocket()
-    {
-        if (!socketReady) return;
-
-        writer.Close();
-        reader.Close();
-        socket.Close();
-        socketReady = false;
-    }
-
-    void OffComputer()
-    {
-        ProcessStartInfo proInfo = new ProcessStartInfo();
-        Process pro = new Process();
+        void OffComputer()
+        {
+            ProcessStartInfo proInfo = new ProcessStartInfo();
+            Process pro = new Process();
 
 
-        proInfo.FileName = @"cmd"; // 실행할 파일명 입력
+            proInfo.FileName = @"cmd"; // 실행할 파일명 입력
 
-        proInfo.CreateNoWindow = false; // cmd 창 띄우기 true(띄우지않기), false(띄우기)
-        proInfo.UseShellExecute = false;
-        proInfo.RedirectStandardOutput = true; // cmd 데이터받기
-        proInfo.RedirectStandardInput = true; // cmd 데이터 보내기
-        proInfo.RedirectStandardError = true; // 오류내용 받기
-
-
-        pro.StartInfo = proInfo;
-        pro.Start();
-        pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine);
-        pro.StandardInput.Close();
+            proInfo.CreateNoWindow = false; // cmd 창 띄우기 true(띄우지않기), false(띄우기)
+            proInfo.UseShellExecute = false;
+            proInfo.RedirectStandardOutput = true; // cmd 데이터받기
+            proInfo.RedirectStandardInput = true; // cmd 데이터 보내기
+            proInfo.RedirectStandardError = true; // 오류내용 받기
 
 
-        pro.WaitForExit();
-        pro.Close();
+            pro.StartInfo = proInfo;
+            pro.Start();
+            pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine);
+            pro.StandardInput.Close();
 
+
+            pro.WaitForExit();
+            pro.Close();
+
+        }
     }
 }
