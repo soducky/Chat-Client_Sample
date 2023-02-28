@@ -40,7 +40,7 @@ public class DataManager : MonoBehaviour
             // 저장된 파일 읽어오고 Json을 클래스 형식으로 전환해서 할당
             string FromJsonData = File.ReadAllText(filePath);
             data = JsonUtility.FromJson<Data>(FromJsonData);
-            print("불러오기 완료");
+
         }
     }
 
@@ -56,6 +56,6 @@ public class DataManager : MonoBehaviour
         File.WriteAllText(filePath, ToJsonData);
 
         // 올바르게 저장됐는지 확인 (자유롭게 변형)
-        print("저장 완료");
+;
     }
 }

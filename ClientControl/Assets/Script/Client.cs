@@ -17,13 +17,13 @@ public class Client : MonoBehaviour
     string clientName;
 
     bool socketReady; // 소켓 준비되었는지
+
+    string mes;
+
     TcpClient socket;
     NetworkStream stream; // 스트림 보기
     StreamWriter writer;
     StreamReader reader;
-
-   // int Port;
-   // string ServerIP;
 
     // private string SendStr = "%1POWR";
     // private IEnumerator coroutine;
@@ -43,14 +43,13 @@ public class Client : MonoBehaviour
         }
 
         // 기본 호스트/ 포트번호
-      // ClientIP = ClientInput.text;
-     //  Port = PortInput.text == "" ? DataManager.Instance.data.Port : int.Parse(PortInput.text);
-      //  ServerIP = ServerInput.text == "" ? DataManager.Instance.data.ServerIP : ServerInput.text;
+        string ip = DataManager.Instance.data.ServerIP;
+        int port = int.Parse(DataManager.Instance.data.Port);
 
         // 소켓 생성
         try
         {
-            socket = new TcpClient(DataManager.Instance.data.ServerIP, DataManager.Instance.data.Port);
+            socket = new TcpClient(ip, port);
             stream = socket.GetStream();
             writer = new StreamWriter(stream);
             reader = new StreamReader(stream);
@@ -59,6 +58,8 @@ public class Client : MonoBehaviour
         catch (Exception e)
         {
             Chat.instance.ShowMessage($"소켓에러 : {e.Message}");
+         //   GameObject.FindGameObjectWithTag("Restart").GetComponent<RestartBtn>().ButtonBtn();
+
         }
     }
 
@@ -94,6 +95,8 @@ public class Client : MonoBehaviour
             {
                 clientName = DataManager.Instance.data.ClientIP;
                 Send($"&NAME|{clientName}");
+                OnSendButton(mes);
+
                 return;
             }
 
@@ -103,7 +106,6 @@ public class Client : MonoBehaviour
                 OffComputer();
             }
 
-            Chat.instance.ShowMessage(data);
         }
 
         void Send(string data)
@@ -125,19 +127,15 @@ public class Client : MonoBehaviour
             }
         }
 
-      /*  public void OnSendButton(string SendInput)
+        void OnSendButton(string SendInput)
         {
             if (SendInput.Trim() == "") return;
-            SendInput = "c";
+            SendInput = clientName;
             string message = SendInput;
 
             Send(message);
 
         }
-         void OnApplicationQuit()
-        {
-            CloseSocket();
-        }*/
 
         void CloseSocket()
         {

@@ -7,6 +7,8 @@ TagManager:
   - ClientIP
   - Port
   - ServerIP
+  - Client
+  - Restart
   layers:
   - Default
   - TransparentFX

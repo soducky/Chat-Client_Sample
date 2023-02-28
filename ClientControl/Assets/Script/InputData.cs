@@ -39,7 +39,7 @@ public class InputData : MonoBehaviour // 데이터 입력 클래스
     public void GameDataSaveKey()  // 데이터를 key 값으로 변환 
     {
         DataManager.Instance.data.ClientIP = PlayerPrefs.GetString("InputClientIP");
-        DataManager.Instance.data.Port = PlayerPrefs.GetInt("InputPort");
+        DataManager.Instance.data.Port = PlayerPrefs.GetInt("InputPort").ToString();
         DataManager.Instance.data.ServerIP = PlayerPrefs.GetString("ServerClientIP");
         // 데이터들을 PlayerPrefs 값으로 변환시켜서 저장하여 불러오기를 쉽게 하기 위해
     }
