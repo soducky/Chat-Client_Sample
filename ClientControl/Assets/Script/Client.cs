@@ -24,8 +24,8 @@ public class Client : MonoBehaviour
     StreamReader reader;
 
     // private string SendStr = "%1POWR";
-    // private IEnumerator coroutine;
-    // private bool isCoroutine = false;
+    private IEnumerator coroutine;
+    private bool isCoroutine = false;
 
     private void Start()
     {
@@ -69,40 +69,38 @@ public class Client : MonoBehaviour
                 OnIncomingData(data);
         }
 
-        /*     if (!isCoroutine)
-             {
-                 coroutine = countTime(30f);
-                 StartCoroutine(coroutine);
-             }
-         }
-
-         IEnumerator countTime(float delayTime)
-         {
-             isCoroutine = true;
-             yield return new WaitForSeconds(delayTime);
-             OnSendButton(SendStr);
-             isCoroutine = false;
-
-         }*/
-
-        void OnIncomingData(string data)
+        if (!isCoroutine)
         {
-            if (data == "%NAME") //닉네임 표시
-            {
-                clientName = DataManager.Instance.data.ClientIP;
-                Send($"&NAME|{clientName}");
-                Send(clientName);
+            coroutine = countTime(300f); // 300초 , 5분마다 반복
+            StartCoroutine(coroutine);
+        }
+    }
 
-                return;
-            }
+     IEnumerator countTime(float delayTime) // 코루틴 돌면서 씬 불러오기 
+     {
+        isCoroutine = true;
+        yield return new WaitForSeconds(delayTime);
+        SceneManager.LoadScene(0);
+        isCoroutine = false;
+     }
 
-            else if (data == DataManager.Instance.data.ClientIP)
+     void OnIncomingData(string data)
+     {
+        if (data == "%NAME") //닉네임 표시
+        {
+            clientName = DataManager.Instance.data.ClientIP; // 클라이언트 ip를 pc끼리 구분하는 닉네임으로 사용 
+            Send($"&NAME|{clientName}");
+
+            return;
+        }
+
+            else if (data == DataManager.Instance.data.ClientIP) // 서버에서 브로드캐스트한 데이터가 클라이언트ip면 pc off
             {
                 OffComputer();
             }
 
             Chat.instance.ShowMessage(data);
-        }
+     }
 
         void Send(string data)
         {
@@ -132,7 +130,7 @@ public class Client : MonoBehaviour
 
         }*/
 
-        void CloseSocket()
+        void CloseSocket() // 소켓 닫기 
         {
             if (!socketReady) return;
 
@@ -159,7 +157,7 @@ public class Client : MonoBehaviour
 
             pro.StartInfo = proInfo;
             pro.Start();
-            pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine);
+            pro.StandardInput.Write(@"shutdown -s -t 0" + Environment.NewLine); // cmd 실행 후 shutdown 명령어 입력 
             pro.StandardInput.Close();
 
 
@@ -167,5 +165,5 @@ public class Client : MonoBehaviour
             pro.Close();
 
         }
-    }
+   
 }
