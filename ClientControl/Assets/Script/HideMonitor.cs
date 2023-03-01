@@ -13,11 +13,10 @@ public class HideMonitor : MonoBehaviour
     public GameObject HideImg; // 화면을 가릴 가림막
 
     int i = 1; // 초기값 1 
-    void Start()
+    void Awake ()
     {
-
+        Application.runInBackground = true; 
     }
-
 
     void Update()
     {

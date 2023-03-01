@@ -10,15 +10,13 @@ using System.Diagnostics;
 using TMPro;
 using UnityEngine.UIElements;
 using UnityEngine.Windows;
+using UnityEngine.SceneManagement;
 
 public class Client : MonoBehaviour
 {
-   // public InputField ClientInput, PortInput, ServerInput;  //클라이언트ip, 포트, 서버 ip 3개 선언 -인풋 필드 
     string clientName;
 
     bool socketReady; // 소켓 준비되었는지
-
-    string mes;
 
     TcpClient socket;
     NetworkStream stream; // 스트림 보기
@@ -58,8 +56,6 @@ public class Client : MonoBehaviour
         catch (Exception e)
         {
             Chat.instance.ShowMessage($"소켓에러 : {e.Message}");
-         //   GameObject.FindGameObjectWithTag("Restart").GetComponent<RestartBtn>().ButtonBtn();
-
         }
     }
 
@@ -95,17 +91,17 @@ public class Client : MonoBehaviour
             {
                 clientName = DataManager.Instance.data.ClientIP;
                 Send($"&NAME|{clientName}");
-                OnSendButton(mes);
+                Send(clientName);
 
                 return;
             }
 
             else if (data == DataManager.Instance.data.ClientIP)
             {
-                Chat.instance.ShowMessage("offcomputer");
                 OffComputer();
             }
 
+            Chat.instance.ShowMessage(data);
         }
 
         void Send(string data)
@@ -120,14 +116,13 @@ public class Client : MonoBehaviour
 
             catch (Exception e)
             {
-                Chat.instance.ShowMessage("소켓다시생성");
-                UnityEngine.Debug.Log(e);
+                Chat.instance.ShowMessage("소켓다시생성"+e);
                 CloseSocket();
                 ConnectToServer();
             }
         }
 
-        void OnSendButton(string SendInput)
+       /* void OnSendButton(string SendInput)
         {
             if (SendInput.Trim() == "") return;
             SendInput = clientName;
@@ -135,7 +130,7 @@ public class Client : MonoBehaviour
 
             Send(message);
 
-        }
+        }*/
 
         void CloseSocket()
         {
