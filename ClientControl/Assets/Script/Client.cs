@@ -25,8 +25,9 @@ public class Client : MonoBehaviour
     StreamReader reader;
 
     private IEnumerator coroutine; // 코루틴(문자 보내기 위해) -> 태블릿과 통신
-    private bool isCoroutine = false;
-    private bool thisCoroutine = false;
+    private bool isCoroutine = false; // 2분짜리 코루틴 update문에 사용 
+    private bool thisCoroutine = false; // 2분짜리 코루틴  SceneReLoad에 사용
+    private bool LoadCoroutine = false; // 1분짜리 코루틴 소켓 재생성 부분에 사용 (Send메소드)
 
     private void Start()
     {
@@ -58,9 +59,9 @@ public class Client : MonoBehaviour
         {
             Chat.instance.ShowMessage($"소켓에러 : {e.Message}"); // 소켓에러시 씬 다시 로드 
 
-            if (!isCoroutine)
+            if (!thisCoroutine)
             {
-                coroutine = SceneReLoad(180f); // 180초 , 3분마다 반복
+                coroutine = SceneReLoad(120f); // 120초 , 2분마다 반복
                 StartCoroutine(coroutine);
                 UnityEngine.Debug.Log(thisCoroutine);
             }
@@ -138,17 +139,28 @@ public class Client : MonoBehaviour
             Chat.instance.ShowMessage("소켓다시생성"+e);
 
 
-            if (!isCoroutine)
+            if (!LoadCoroutine)
             {
-                coroutine = SceneReLoad(180f); // 180초 , 3분마다 반복
+                coroutine = LoadSocket(60f); // 60초마다 반복
                 StartCoroutine(coroutine);
+                UnityEngine.Debug.Log("dd"); 
             }
             //CloseSocket();
             //ConnectToServer();
         }
     }
 
-     void OnSendButton(string SendInput)
+    IEnumerator LoadSocket(float delayTime) // 코루틴 돌면서 문자 보내기
+    {
+        thisCoroutine = true;
+        yield return new WaitForSeconds(delayTime);
+
+        SceneManager.LoadScene(0);  //start문에서 catch문으로 이동시 씬 다시로드
+
+        thisCoroutine = false;
+    }
+
+    void OnSendButton(string SendInput)
      {
          //if (SendInput.Trim() == "") return;
          SendInput = DataManager.Instance.data.ClientIP + 0; // 종료될때 종료신호 보내기
