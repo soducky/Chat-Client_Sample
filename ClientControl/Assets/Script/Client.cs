@@ -63,7 +63,6 @@ public class Client : MonoBehaviour
             {
                 coroutine = SceneReLoad(120f); // 120초 , 2분마다 반복
                 StartCoroutine(coroutine);
-                UnityEngine.Debug.Log(thisCoroutine);
             }
         }
     }
@@ -143,7 +142,6 @@ public class Client : MonoBehaviour
             {
                 coroutine = LoadSocket(60f); // 60초마다 반복
                 StartCoroutine(coroutine);
-                UnityEngine.Debug.Log("dd"); 
             }
             //CloseSocket();
             //ConnectToServer();
@@ -152,12 +150,12 @@ public class Client : MonoBehaviour
 
     IEnumerator LoadSocket(float delayTime) // 코루틴 돌면서 문자 보내기
     {
-        thisCoroutine = true;
+        LoadCoroutine = true;
         yield return new WaitForSeconds(delayTime);
 
         SceneManager.LoadScene(0);  //start문에서 catch문으로 이동시 씬 다시로드
 
-        thisCoroutine = false;
+        LoadCoroutine = false;
     }
 
     void OnSendButton(string SendInput)
