@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class InputData : MonoBehaviour // 데이터 입력 클래스 
 {
-
     private void Start()
     {
         DataManager.Instance.LoadGameData();

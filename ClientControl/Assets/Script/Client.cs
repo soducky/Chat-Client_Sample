@@ -25,8 +25,8 @@ public class Client : MonoBehaviour
     StreamReader reader;
 
     private IEnumerator coroutine; // 코루틴(문자 보내기 위해) -> 태블릿과 통신
-    private bool isCoroutine = false; // 2분짜리 코루틴 update문에 사용 
-    private bool thisCoroutine = false; // 2분짜리 코루틴  SceneReLoad에 사용
+    private bool isCoroutine = false; // 1분짜리 코루틴 update문에 사용 
+    private bool thisCoroutine = false; // 1분짜리 코루틴  SceneReLoad에 사용
     private bool LoadCoroutine = false; // 1분짜리 코루틴 소켓 재생성 부분에 사용 (Send메소드)
 
     private void Start()
@@ -61,7 +61,7 @@ public class Client : MonoBehaviour
 
             if (!thisCoroutine)
             {
-                coroutine = SceneReLoad(120f); // 120초 , 2분마다 반복
+                coroutine = SceneReLoad(60f); // 60초 , 1분마다 반복
                 StartCoroutine(coroutine);
             }
         }
@@ -89,7 +89,7 @@ public class Client : MonoBehaviour
 
         if (!isCoroutine)
         {
-            coroutine = countTime(120f); // 120초 , 2분마다 반복
+            coroutine = countTime(60f); // 60초 , 1분마다 반복
             StartCoroutine(coroutine);
         }
     }
